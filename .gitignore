@@ -1,0 +1,13 @@
+.svn
+build
+dist
+Thumbs.db
+thumbs.db
+*~
+*#
+*.fasl
+etc/apache.conf
+/etc/init.d
+logs
+bin
+_darcs

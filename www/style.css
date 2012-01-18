@@ -1,0 +1,7 @@
+body {
+    width: 800px;
+    margin: 20px auto;
+    font-family: "Gill Sans", sans-serif;
+}
+
+.res { border-bottom : 1px solid #AAA; }
