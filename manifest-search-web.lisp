@@ -60,11 +60,19 @@
          :n (or n 25)
          :result-fn #'json-search-results-fn)))))
 
+(defun search-results-lisp (q n)
+  (setf (hunchentoot:content-type*) "application/sexp")
+  (princ-to-string
+   (search-manifest-collecting
+    #?"DOCUMENTATION:(${q})" :n n)))
+
 (hunchentoot:define-easy-handler (search-handler :uri "/search")
     (q (n :parameter-type 'integer)
       (type :parameter-type #'symbol-munger:english->keyword))  
   (case type
     (:json (search-results-json q n))
+    ((or :lisp :plist)
+     (search-results-lisp q n))
     (T (search-view q n))))
 
 (defun window (&optional (title "Search Lisp Documentation") &rest content)
@@ -91,15 +99,18 @@
         (xhtml:input `(:type "text" :value ,search :name "q"))
         (xhtml:button () "Search"))
       (when search
-        (let ((results (search-manifest-collecting
-                        #?"DOCUMENTATION:(${search})" :n n)))
+        (let ((results
+                (search-manifest-collecting
+                 #?"DOCUMENTATION:(${search})" :n n)))
          (xhtml:div '(:class "results")
             (mapcar #'search-result-fn results)
            ))))))
 
 (defun sr-val (r name)
   "get a value from the search results"
-  (getf r name))
+  (etypecase r
+    (montezuma:document (doc-value r name))
+    (list (getf r name))))
 
 (defun search-result-fn (d)
   (let ((package (sr-val d :package))

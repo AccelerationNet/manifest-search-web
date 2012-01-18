@@ -4,4 +4,4 @@ body {
     font-family: "Gill Sans", sans-serif;
 }
 
-.res { border-bottom : 1px solid #AAA; }
+.res { whitespace:pre-line; border-bottom : 1px solid #AAA; }
