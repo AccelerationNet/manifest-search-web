@@ -12,9 +12,11 @@
   :licence "BSD"
   :version "0.1"
   :components ((:file "manifest-search-web"))
-  :depends-on (:alexandria :collectors :symbol-munger
+  :depends-on (:alexandria
+               :collectors :symbol-munger
+               :swank ;; for introspection facilities
                :iterate :manifest-search :buildnode-xhtml :cl-interpol
-                           :hunchentoot :cl-json))
+               :hunchentoot :cl-json))
 
 ;; (defsystem :manifest-search-web-test
 ;;   :description "a test for manifest-search-web"
