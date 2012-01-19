@@ -103,10 +103,12 @@
     (montezuma:document (doc-value r name))
     (list (getf r name))))
 
-(defun shorten-string (s &optional (length 512) (ellipses "...") )
+(defun shorten-string (s &optional (length 512) (ellipses "...")
+                         &aux (slen (length s)) )
   "Make a long string shorter"
   (cond
-    ((<= (length s) length) s)
+    ((= slen 0) nil)
+    ((<= slen length) s)
     (T (concatenate 'string (subseq s 0 (- length (length ellipses)))
 		    ellipses))))
 
@@ -127,7 +129,8 @@
       (xhtml:div '(:class "description")
         (case type
           (:package
-           (shorten-string (sr-val d :readme)))
+           (or (shorten-string (sr-val d :readme))
+               (shorten-string (sr-val d :documentation))))
           (t (shorten-string (sr-val d :documentation))))))))
 
 

@@ -4,5 +4,5 @@ body {
     font-family: "Gill Sans", sans-serif;
 }
 
-.res { white-space:pre; border-bottom : 1px solid #AAA; }
-.readme{ white-space:pre; }
+.res {border-bottom : 1px solid #AAA; }
+.res, .documentation, .readme{ white-space:pre; }
