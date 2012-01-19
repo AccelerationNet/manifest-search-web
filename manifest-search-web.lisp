@@ -107,12 +107,13 @@
                          &aux (slen (length s)) )
   "Make a long string shorter"
   (cond
+    ((null length) s)
     ((= slen 0) nil)
     ((<= slen length) s)
     (T (concatenate 'string (subseq s 0 (- length (length ellipses)))
 		    ellipses))))
 
-(defun search-result-fn (d)
+(defun search-result-fn (d &optional (shorten-to 512))
   (let* ((name (sr-val d :name))
          (type (intern (sr-val d :type) :keyword))
          (package (case type
@@ -129,10 +130,12 @@
       (xhtml:div '(:class "description")
         (case type
           (:package
-           (or (shorten-string (sr-val d :readme))
-               (shorten-string (sr-val d :documentation))))
-          (t (shorten-string (sr-val d :documentation))))))))
+           (or (shorten-string (sr-val d :readme) shorten-to)
+               (shorten-string (sr-val d :documentation) shorten-to)))
+          (t (shorten-string (sr-val d :documentation) shorten-to)))))))
 
+(defun display-item-fn (d)
+  (search-result-fn d nil))
 
 (defun package-view (package)
   (let ((doc (package-document package))
@@ -145,8 +148,7 @@
         (xhtml:div '(:class "readme")
           (doc-value doc :readme))
         (xhtml:div '(:class "members")
-          (iter (for i in items)
-            (collect (search-result-fn i))))))))
+          (mapcar #'display-item-fn items))))))
 
 (hunchentoot:define-easy-handler (%package-view :uri "/package")
     ((p :parameter-type #'symbol-munger:english->keyword))
