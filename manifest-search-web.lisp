@@ -91,7 +91,7 @@
 
 (defun %search-form (&optional q)
   (xhtml:form `(:action "/search" :method :get)
-    (xhtml:input `(:type "text" :value ,(or q "") :name "q"))
+    (xhtml:input `(:type "text" :value ,(or q "") :name "q" :class "search"))
     (xhtml:button () "Search")))
 
 (defun search-view (&optional q n)

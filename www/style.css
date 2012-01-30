@@ -8,5 +8,6 @@ body {
 
 .res {border-bottom : 1px solid #AAA; }
 .res, .documentation, .readme{ white-space:pre; }
+input.search {width:400px;}
 
 body.welcome {}
