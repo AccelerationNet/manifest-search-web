@@ -1,8 +1,12 @@
 body {
-    width: 800px;
-    margin: 20px auto;
-    font-family: "Gill Sans", sans-serif;
+   width: 800px;
+   padding: 10px 10px 75px 10px;
+   font-family: "Gill Sans", sans-serif;
+   background: url(lisp-logo.jpg)  bottom right transparent no-repeat;
 }
+
 
 .res {border-bottom : 1px solid #AAA; }
 .res, .documentation, .readme{ white-space:pre; }
+
+body.welcome {}

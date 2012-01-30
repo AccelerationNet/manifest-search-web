@@ -22,6 +22,7 @@
     (setf *acceptor*
           (make-instance 'hunchentoot:easy-acceptor
                          :port port
+                         :address "127.0.0.1"
                          :document-root (resource-path "www")))
     (hunchentoot:start *acceptor*)))
 
@@ -50,7 +51,7 @@
       (json:with-array ()
         (search-manifest
          #?"DOCUMENTATION:(${q}) README:(${q})"
-         :n (or n 25)
+         :n (or n 50)
          :result-fn #'json-search-results-fn)))))
 
 (defun search-results-lisp (q n)
@@ -68,29 +69,37 @@
      (search-results-lisp q n))
     (T (search-view q n))))
 
-(defun window (&optional (title "Search Lisp Documentation") &rest content)
+(defun window (&optional (title "Search Lisp Documentation")
+                 (body-class "")
+               &rest content)
   (xhtml:html ()
     (xhtml:head ()
       (xhtml:link `(:type :text/css :rel :stylesheet :href :style.css) )
       (xhtml:title () title))
-    (xhtml:body ()
+    (xhtml:body `(:class ,body-class)
       (xhtml:h1 () title)
-      content)))
+      (xhtml:a '(href "/") "Home")
+      (xhtml:div '(:class "content")
+        content))))
 
-(defmacro render-window ((&key (title "Quicklisp Documentation"))
+(defmacro render-window ((&key (title "Quicklisp Documentation")
+                            class)
                          &body body)
   `(buildnode:document-to-string
     (with-html-document
-      (window ,title ,@body))))
+      (window ,title ,class ,@body))))
+
+(defun %search-form (&optional q)
+  (xhtml:form `(:action "/search" :method :get)
+    (xhtml:input `(:type "text" :value ,(or q "") :name "q"))
+    (xhtml:button () "Search")))
 
 (defun search-view (&optional q n)
   (render-window (:title (if q
                              "Common Lisp Documentation Search Results"
                              "Search Common Lisp Documentation"))
     (xhtml:div `(:class "search")
-      (xhtml:form ()
-        (xhtml:input `(:type "text" :value ,q :name "q"))
-        (xhtml:button () "Search"))
+      (%search-form q)
       (when q
         (let ((results
                 (search-manifest-collecting
@@ -154,3 +163,53 @@
 (hunchentoot:define-easy-handler (%package-view :uri "/package")
     ((p :parameter-type #'symbol-munger:english->keyword))
   (package-view p))
+
+(defun welcome-view ()
+  (render-window (:title "Common Lisp Documentation Search Engine"
+                   :class "welcome")
+    (xhtml:div '()
+      (%search-form)
+      (xhtml:p ()
+        "Here you can search the doc strings of all packages that are quicklisp loadable. ")
+      (xhtml:p `(:class "about")
+        "The source for this website is at "
+        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search-web")
+          "manifest-search-web")
+        " with its sister project " 
+        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search")
+          "manifest-search. ")
+        "Inspired by and utilizing "
+        (xhtml:a '(href "https://github.com/gigamonkey/manifest")
+          "manifest. ")
+        (xhtml:a '(href "https://github.com/gigamonkey/manifest"))
+        "This project utilizes "
+        (xhtml:a '(href "http://code.google.com/p/montezuma/") "montezuma")
+        ", a common lisp port of lucene. Searches are performed using a subset of
+         lucene syntax. "
+        (xhtml:a '(href "http://l1sp.org")
+          "Also see l1sp.org for a different kind of common lisp documentation search."))
+      (xhtml:p '()
+        (xhtml:h4 () "/search")
+        "Searches common lisp docstrings"
+        (xhtml:ul '(:class :parameters)
+          (xhtml:li '(:class "n")
+            "The \"n\" paramter controls the number of results (default 50)")
+          (xhtml:li '(:class "q")
+            "The \"q\" paramter is the search to be returned")
+          (xhtml:li '(:class "type")
+            "The \"type\" paramter is the format of the search
+        results.  Defaults to html but also accepts json and lisp.
+        Lisp returns a list of plists of search results")))
+      (xhtml:p '()
+        (xhtml:h4 () "/package")
+        "Displays the documentation for a given package (and its contents)"
+        (xhtml:ul '(:class :parameters)
+          (xhtml:li '(:class "p")
+            "The \"p\" paramter controls the package documentation to display")))
+      (xhtml:p '(:class "issues")
+        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search-web")
+          "Please report bugs or suggest improvements at the github project page.")))))
+
+(hunchentoot:define-easy-handler (%welcome :uri "/")
+    ()
+  (welcome-view))

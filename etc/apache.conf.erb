@@ -20,6 +20,7 @@
 	RewriteEngine On
 	RewriteOptions Inherit 
 
+   # sites is a non standard dir that we created
    ErrorLog /var/log/apache2/sites/<%=application%>-error.log
    CustomLog /var/log/apache2/sites/<%=application%>-custom.log combined
 
@@ -33,6 +34,7 @@
 <% end %>
    RewriteRule ^/(.*)$ http://127.0.0.1:<%=port%>/$1 [P]
 
+   # should really be in an ifexists (solved in rake)
    FilterDeclare gzipping CONTENT_SET
    FilterProvider gzipping deflate Content-Type $text/html
    FilterProvider gzipping deflate Content-Type text/css
