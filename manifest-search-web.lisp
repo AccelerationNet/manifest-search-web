@@ -190,14 +190,14 @@
           "Also see l1sp.org for a different kind of common lisp documentation search."))
       (xhtml:p '()
         (xhtml:h4 () "/search")
-        "Searches common lisp docstrings"
+        "Searches common lisp doc-strings"
         (xhtml:ul '(:class :parameters)
           (xhtml:li '(:class "n")
-            "The \"n\" paramter controls the number of results (default 50)")
+            "The \"n\" parameter controls the number of results (default 50)")
           (xhtml:li '(:class "q")
-            "The \"q\" paramter is the search to be returned")
+            "The \"q\" parameter is the search to be returned")
           (xhtml:li '(:class "type")
-            "The \"type\" paramter is the format of the search
+            "The \"type\" parameter is the format of the search
         results.  Defaults to html but also accepts json and lisp.
         Lisp returns a list of plists of search results")))
       (xhtml:p '()
@@ -205,7 +205,7 @@
         "Displays the documentation for a given package (and its contents)"
         (xhtml:ul '(:class :parameters)
           (xhtml:li '(:class "p")
-            "The \"p\" paramter controls the package documentation to display")))
+            "The \"p\" parameter controls the package documentation to display")))
       (xhtml:p '()
         (xhtml:h4 () "Document Index")
         "The montezuma index driving this website can be downloaded at: "
