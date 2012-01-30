@@ -39,8 +39,8 @@
           (arg-value "--webroot")))
 
 (defun main ()
-  (sb-posix:setuid (sb-posix:passwd-uid (sb-posix:getpwnam "www-data")))
   (sb-posix:setgid (sb-posix:group-gid (sb-posix:getgrnam "www-data")))
+  (sb-posix:setuid (sb-posix:passwd-uid (sb-posix:getpwnam "www-data")))
   (setf *web-root*
         (or +web-root+
             ;; just set this explicitly for now

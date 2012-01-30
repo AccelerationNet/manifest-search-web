@@ -48,14 +48,16 @@ namespace :lisp do
     puts "Restarted lisp and apache on the remote server."
   end
 
+  desc "zip the doc index into the www folder".cleanup
+  task :do_zips do
+    system("rm www/doc-index.tar.gz")
+    system("tar -zcf www/doc-index.tar.gz doc-index")
+  end
+  
+  Rake::Task['lisp:publish'].prerequisites.push('lisp:do_zips')
+
 end
 
 ### Make a zip of the docs
 
-desc "zip the doc index into the www folder".cleanup
-task :do_zips do
-  system("rm www/doc-index.tar.gz")
-  system("tar -zcf www/doc-index.tar.gz doc-index")
-end
 
-Rake::Task['lisp:publish'].prerequisites.push(':do_zips')
