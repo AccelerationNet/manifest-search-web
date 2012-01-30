@@ -5,16 +5,17 @@
   (:shadowing-import-from :alexandria :ensure-list)
   (:shadowing-import-from :buildnode :with-html-document)
   (:shadowing-import-from :manifest-search :doc-value :find-doc-by-key :docs-for-term)
-  (:export ))
+  (:export *web-root* start-server stop-server resource-path))
 
 (in-package :manifest-search-web)
 (cl-interpol:enable-interpol-syntax)
 
 (defvar *acceptor* nil "the hunchentoot acceptor")
+(defvar *web-root* (truename (asdf:system-source-directory :manifest-search-web)))
 
 (defun resource-path (path)
   "looks up path relative to whereever this asdf system is installed.  Returns a truename"
-  (truename (asdf:system-relative-pathname :manifest-search-web path)))
+  (truename (merge-pathnames path *web-root* )))
 
 (defun start-server (&optional (port 8888))
   (unless *acceptor*

@@ -1,0 +1,43 @@
+# -*- mode: apache; tab-width: 3 -*-
+
+<VirtualHost <%=app_ip%>:80>
+	ServerName <%=application%>
+	ServerAdmin webmaster@acceleration.net
+
+	 <Proxy *>
+		  Order deny,allow
+		  Allow from all
+	 </Proxy>
+	 ProxyPreserveHost On
+
+	#DirectoryIndex default.htm default.html index.htm index.html
+	<Directory <%=deploy_to%>>
+		 Options -Indexes
+		 Order deny,allow
+		 deny from all
+	</Directory>
+
+	RewriteEngine On
+	RewriteOptions Inherit 
+
+   ErrorLog /var/log/apache2/sites/<%=application%>-error.log
+   CustomLog /var/log/apache2/sites/<%=application%>-custom.log combined
+
+<% web_folders.each do |wf| %>
+   <Directory <%=current_path%>/<%=wf%>>
+	   Order allow,deny
+	   allow from all
+   </Directory>
+   RewriteCond         <%=current_path%>/<%=wf%>/%{REQUEST_FILENAME}  -f
+   RewriteRule  ^(.+)  <%=current_path%>/<%=wf%>/$1  [L]
+<% end %>
+   RewriteRule ^/(.*)$ http://127.0.0.1:<%=port%>/$1 [P]
+
+   FilterDeclare gzipping CONTENT_SET
+   FilterProvider gzipping deflate Content-Type $text/html
+   FilterProvider gzipping deflate Content-Type text/css
+   FilterProvider gzipping deflate Content-Type $javascript
+   FilterProvider gzipping deflate Content-Type application/json
+   FilterChain gzipping
+
+</VirtualHost>
