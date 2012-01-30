@@ -182,7 +182,7 @@
         (xhtml:a '(href "https://github.com/gigamonkey/manifest")
           "manifest. ")
         (xhtml:a '(href "https://github.com/gigamonkey/manifest"))
-        "This project utilizes "
+        "This project uses "
         (xhtml:a '(href "http://code.google.com/p/montezuma/") "montezuma")
         ", a common lisp port of lucene. Searches are performed using a subset of
          lucene syntax. "
@@ -206,6 +206,11 @@
         (xhtml:ul '(:class :parameters)
           (xhtml:li '(:class "p")
             "The \"p\" paramter controls the package documentation to display")))
+      (xhtml:p '()
+        (xhtml:h4 () "Document Index")
+        "The montezuma index driving this website can be downloaded at: "
+        (xhtml:a '(:href "doc-index.tar.gz" :rel "no-follow")
+          "doc-index.tar.gz"))
       (xhtml:p '(:class "issues")
         (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search-web")
           "Please report bugs or suggest improvements at the github project page.")))))
