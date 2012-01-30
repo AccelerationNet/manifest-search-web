@@ -5,6 +5,10 @@ searching common lisp documentation (ala manifest-search).
 
 Uses Hunchentoot web server to serve json and HTML
 
+## See it in action
+
+http://lisp-search.acceleration.net
+
 
 ## License
 
