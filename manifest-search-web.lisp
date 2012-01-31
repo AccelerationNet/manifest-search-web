@@ -18,6 +18,7 @@
   (truename (merge-pathnames path *web-root* )))
 
 (defun start-server (&optional (port 8888))
+  "Starts the server on specified port unless there is already a server running"
   (unless *acceptor*
     (setf *acceptor*
           (make-instance 'hunchentoot:easy-acceptor
@@ -27,12 +28,14 @@
     (hunchentoot:start *acceptor*)))
 
 (defun stop-server ()
+  "Stops the running server if it exists"
   (when *acceptor*
     (hunchentoot:stop *acceptor*)
     (setf *acceptor* nil)
     T))
 
 (defun json-search-results-fn (doc score)
+  "encodes a single search result as json"
   (json:as-array-member ()
     (json:with-object ()
       (iter (for n in (list :package :name :type :documentation))
@@ -45,6 +48,8 @@
         (json:encode-json score)))))
 
 (defun search-results-json (q n)
+  "Execute a query returning n results and write the whole thing out as a string
+   also sets the hunchentoot content-type to be json"
   (setf (hunchentoot:content-type*) "application/json")
   (when q
     (with-output-to-string (json:*json-output*)
@@ -55,6 +60,7 @@
          :result-fn #'json-search-results-fn)))))
 
 (defun search-results-lisp (q n)
+  "Run a query returning n results and write the results as a list of plists"
   (setf (hunchentoot:content-type*) "application/sexp")
   (princ-to-string
    (search-manifest-collecting
@@ -72,6 +78,7 @@
 (defun window (&optional (title "Search Lisp Documentation")
                  (body-class "")
                &rest content)
+  "Render the standard window frame this site will use"
   (xhtml:html ()
     (xhtml:head ()
       (xhtml:link `(:type :text/css :rel :stylesheet :href :style.css) )
@@ -85,16 +92,19 @@
 (defmacro render-window ((&key (title "Quicklisp Documentation")
                             class)
                          &body body)
+  "Render the body in a window with the given body and class"
   `(buildnode:document-to-string
     (with-html-document
       (window ,title ,class ,@body))))
 
 (defun %search-form (&optional q)
+  "A snippet of html that is the search form"
   (xhtml:form `(:action "/search" :method :get)
     (xhtml:input `(:type "text" :value ,(or q "") :name "q" :class "search"))
     (xhtml:button () "Search")))
 
 (defun search-view (&optional q n)
+  "Render the search / search results page for a given query q and n number of results"
   (render-window (:title (if q
                              "Common Lisp Documentation Search Results"
                              "Search Common Lisp Documentation"))
@@ -124,6 +134,7 @@
 		    ellipses))))
 
 (defun search-result-fn (d &optional (shorten-to 512))
+  "Given a single search result produce html to display it"
   (let* ((name (sr-val d :name))
          (type (intern (sr-val d :type) :keyword))
          (package (case type
@@ -145,9 +156,11 @@
           (t (shorten-string (sr-val d :documentation) shorten-to)))))))
 
 (defun display-item-fn (d)
+  "Display a single item from a package as html"
   (search-result-fn d nil))
 
 (defun package-view (package)
+  "Render the view of an entire packages docs"
   (let ((doc (package-document package))
         (items (docs-for-term :package package)))
     (render-window
@@ -165,6 +178,7 @@
   (package-view p))
 
 (defun welcome-view ()
+  "Render the home screen of the site"
   (render-window (:title "Common Lisp Documentation Search Engine"
                    :class "welcome")
     (xhtml:div '()
