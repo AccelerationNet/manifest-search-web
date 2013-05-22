@@ -13,3 +13,5 @@ bin
 _darcs
 doc-index
 www/doc-index.tar.gz
+nginx.conf
+upstart.conf
