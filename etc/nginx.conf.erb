@@ -1,0 +1,22 @@
+# -*- mode: nginx; tab-width: 3 -*-
+
+server {
+    listen 80;
+    server_name <%=application%>;
+
+    error_log /var/log/nginx/<%=application%>-error.log;
+    access_log /var/log/nginx/<%=application%>-access.log;
+
+    location @lisp {
+        proxy_pass http://127.0.0.1:<%=port%>;
+        proxy_set_header Host $host;
+    }
+
+    root <%=current_path%>;
+    try_files <% web_folders.each do |wf| %> /<%=wf%>$uri <% end %> @lisp;
+
+    gzip on;
+    gzip_proxied any;
+    gzip_types text/css text/javascript application/json;
+    gzip_vary on;
+}
