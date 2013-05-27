@@ -7,7 +7,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (cl-user::setup-source-registry))
-
+(ql:quickload :swank)
 (ql:quickload :manifest-search-web)
 (defpackage :manifest-search-web-binary
   (:use :cl :cl-user :manifest-search :manifest-search-web))
@@ -17,6 +17,12 @@
 
 (manifest-search:close-index)
 
+(swank:swank-require
+ '(swank-sprof swank-indentation swank-asdf
+   swank-package-fu swank-presentations swank-fuzzy
+   swank-fancy-inspector swank-c-p-c swank-arglists
+   swank-repl swank-presentation-streams))
+
 (defun process-arg (arg)
   "Removes quotes if they exist"
   (let ((last (- (length arg) 1)))
@@ -25,6 +31,7 @@
 	(subseq arg 1 last)
 	arg
 	)))
+
 (defun process-args (args)  (mapcar #'process-arg args))
 (defvar *args* (process-args sb-ext:*posix-argv*)
   "The command line arguments")
