@@ -15,7 +15,7 @@
   :depends-on (:alexandria
                :collectors :symbol-munger
                :swank ;; for introspection facilities
-               :iterate :manifest-search :buildnode-xhtml :cl-interpol
+               :iterate :manifest-search :buildnode-html5 :cl-interpol
                :hunchentoot :cl-json))
 
 ;; (defsystem :manifest-search-web-test

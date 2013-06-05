@@ -68,14 +68,15 @@
 
 (hunchentoot:define-easy-handler (search-handler :uri "/search")
     (q (n :parameter-type 'integer)
-      (type :parameter-type #'symbol-munger:english->keyword))  
-  (case type
-    (:json (search-results-json q n))
-    ((or :lisp :plist)
-     (search-results-lisp q n))
-    (T (search-view q n))))
+      (type :parameter-type #'symbol-munger:english->keyword))
+  (let ((n (or n 50)))
+    (case type
+      (:json (search-results-json q n))
+      ((or :lisp :plist)
+       (search-results-lisp q n))
+      (T (search-view q n)))))
 
-(defun window (&optional (title "Search Lisp Documentation")
+(defun window (&optional (title "Search Common Lisp Documentation")
                  (body-class "")
                &rest content)
   "Render the standard window frame this site will use"
@@ -84,13 +85,14 @@
       (html5:link `(:type :text/css :rel :stylesheet :href :style.css) )
       (html5:title () title))
     (html5:body `(:class ,body-class)
-      (html5:h1 () title)
-      (html5:a '(href "/") "Home") " "
-      (html5:a '(href "/html/index.html") "Full Index")
-      (html5:div '(:class "content")
+      (html5:header ()
+        (html5:h1 () title)
+        (html5:a '(href "/") "Home") " "
+        (html5:a '(href "/html/index.html") "Static HTML Index"))
+      (html5:section '(:class "content")
         content))))
 
-(defmacro render-window ((&key (title "Quicklisp Documentation")
+(defmacro render-window ((&key (title "Quicklisp - Common Lisp Documentation")
                             class)
                          &body body)
   "Render the body in a window with the given body and class"
@@ -104,7 +106,7 @@
     (html5:input `(:type "text" :value ,(or q "") :name "q" :class "search"))
     (html5:button () "Search")))
 
-(defun search-view (&optional q n)
+(defun search-view (&optional q (n 50))
   "Render the search / search results page for a given query q and n number of results"
   (render-window (:title (if q
                              "Common Lisp Documentation Search Results"
@@ -182,7 +184,7 @@
   "Render the home screen of the site"
   (render-window (:title "Common Lisp Documentation Search Engine"
                    :class "welcome")
-    (html5:div '()
+    (html5:section '()
       (%search-form)
       (html5:p ()
         "Here you can search the doc strings of all packages that are quicklisp loadable. ")
@@ -223,7 +225,7 @@
             "The \"p\" parameter controls the package documentation to display")))
       (html5:p '()
         (html5:h4 () "Document Index")
-        "The montezuma index driving this website can be downloaded at: "
+        "The montezuma index and static package documentation driving this website can be downloaded at: "
         (html5:a '(:href "doc-index.tar.gz" :rel "no-follow")
           "doc-index.tar.gz"))
       (html5:p '(:class "issues")
