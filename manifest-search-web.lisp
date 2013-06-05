@@ -3,7 +3,7 @@
 (cl:defpackage :manifest-search-web
   (:use :cl :cl-user :iterate :manifest-search )
   (:shadowing-import-from :alexandria :ensure-list)
-  (:shadowing-import-from :buildnode :with-html-document)
+  (:shadowing-import-from :buildnode :with-html5-document)
   (:shadowing-import-from :manifest-search :doc-value :find-doc-by-key :docs-for-term)
   (:export *web-root* start-server stop-server resource-path))
 
@@ -79,14 +79,15 @@
                  (body-class "")
                &rest content)
   "Render the standard window frame this site will use"
-  (xhtml:html ()
-    (xhtml:head ()
-      (xhtml:link `(:type :text/css :rel :stylesheet :href :style.css) )
-      (xhtml:title () title))
-    (xhtml:body `(:class ,body-class)
-      (xhtml:h1 () title)
-      (xhtml:a '(href "/") "Home")
-      (xhtml:div '(:class "content")
+  (html5:html ()
+    (html5:head ()
+      (html5:link `(:type :text/css :rel :stylesheet :href :style.css) )
+      (html5:title () title))
+    (html5:body `(:class ,body-class)
+      (html5:h1 () title)
+      (html5:a '(href "/") "Home") " "
+      (html5:a '(href "/html/index.html") "Full Index")
+      (html5:div '(:class "content")
         content))))
 
 (defmacro render-window ((&key (title "Quicklisp Documentation")
@@ -94,27 +95,27 @@
                          &body body)
   "Render the body in a window with the given body and class"
   `(buildnode:document-to-string
-    (with-html-document
+    (with-html5-document
       (window ,title ,class ,@body))))
 
 (defun %search-form (&optional q)
   "A snippet of html that is the search form"
-  (xhtml:form `(:action "/search" :method :get)
-    (xhtml:input `(:type "text" :value ,(or q "") :name "q" :class "search"))
-    (xhtml:button () "Search")))
+  (html5:form `(:action "/search" :method :get)
+    (html5:input `(:type "text" :value ,(or q "") :name "q" :class "search"))
+    (html5:button () "Search")))
 
 (defun search-view (&optional q n)
   "Render the search / search results page for a given query q and n number of results"
   (render-window (:title (if q
                              "Common Lisp Documentation Search Results"
                              "Search Common Lisp Documentation"))
-    (xhtml:div `(:class "search")
+    (html5:div `(:class "search")
       (%search-form q)
       (when q
         (let ((results
                 (search-manifest-collecting
                  #?"DOCUMENTATION:(${q}) README:(${q})" :n n)))
-         (xhtml:div '(:class "results")
+         (html5:div '(:class "results")
             (mapcar #'search-result-fn results)))))))
 
 (defun sr-val (r name)
@@ -141,14 +142,14 @@
                     (:package name)
                     (t (sr-val d :package))) )
          (arglist (or (sr-val d :arglist) ""))
-         (url #?"/package?p=${package}"))
-    (xhtml:div `(:class "res" :id ,name)
-      (xhtml:h4 ()
-        (xhtml:a `(:href ,url) package)
-        (xhtml:a `(:href ,#?"${url}#${name}")
+         (url #?"/html/${ (string-downcase package) }.html"))
+    (html5:div `(:class "res" :id ,name)
+      (html5:h4 ()
+        (html5:a `(:href ,url) package)
+        (html5:a `(:href ,#?"${url}#${name}")
           #?" ${name} ${arglist} ")
         #?"<${type}>")
-      (xhtml:div '(:class "description")
+      (html5:div '(:class "description")
         (case type
           (:package
            (or (shorten-string (sr-val d :readme) shorten-to)
@@ -165,12 +166,12 @@
         (items (docs-for-term :package package)))
     (render-window
         (:title #?"Documentation For ${package}") 
-      (xhtml:div '(:class "package")
-        (xhtml:div '(:class "documentation")
+      (html5:div '(:class "package")
+        (html5:div '(:class "documentation")
           (doc-value doc :documentation))
-        (xhtml:div '(:class "readme")
+        (html5:div '(:class "readme")
           (doc-value doc :readme))
-        (xhtml:div '(:class "members")
+        (html5:div '(:class "members")
           (mapcar #'display-item-fn items))))))
 
 (hunchentoot:define-easy-handler (%package-view :uri "/package")
@@ -181,52 +182,52 @@
   "Render the home screen of the site"
   (render-window (:title "Common Lisp Documentation Search Engine"
                    :class "welcome")
-    (xhtml:div '()
+    (html5:div '()
       (%search-form)
-      (xhtml:p ()
+      (html5:p ()
         "Here you can search the doc strings of all packages that are quicklisp loadable. ")
-      (xhtml:p `(:class "about")
+      (html5:p `(:class "about")
         "The source for this website is at "
-        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search-web")
+        (html5:a '(href "https://github.com/AccelerationNet/manifest-search-web")
           "manifest-search-web")
         " with its sister project " 
-        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search")
+        (html5:a '(href "https://github.com/AccelerationNet/manifest-search")
           "manifest-search. ")
         "Inspired by and utilizing "
-        (xhtml:a '(href "https://github.com/gigamonkey/manifest")
+        (html5:a '(href "https://github.com/gigamonkey/manifest")
           "manifest. ")
-        (xhtml:a '(href "https://github.com/gigamonkey/manifest"))
+        (html5:a '(href "https://github.com/gigamonkey/manifest"))
         "This project uses "
-        (xhtml:a '(href "http://code.google.com/p/montezuma/") "montezuma")
+        (html5:a '(href "http://code.google.com/p/montezuma/") "montezuma")
         ", a common lisp port of lucene. Searches are performed using a subset of
          lucene syntax. "
-        (xhtml:a '(href "http://l1sp.org")
+        (html5:a '(href "http://l1sp.org")
           "Also see l1sp.org for a different kind of common lisp documentation search."))
-      (xhtml:p '()
-        (xhtml:h4 () "/search")
+      (html5:p '()
+        (html5:h4 () "/search")
         "Searches common lisp doc-strings"
-        (xhtml:ul '(:class :parameters)
-          (xhtml:li '(:class "n")
+        (html5:ul '(:class :parameters)
+          (html5:li '(:class "n")
             "The \"n\" parameter controls the number of results (default 50)")
-          (xhtml:li '(:class "q")
+          (html5:li '(:class "q")
             "The \"q\" parameter is the search to be returned")
-          (xhtml:li '(:class "type")
+          (html5:li '(:class "type")
             "The \"type\" parameter is the format of the search
         results.  Defaults to html but also accepts json and lisp.
         Lisp returns a list of plists of search results")))
-      (xhtml:p '()
-        (xhtml:h4 () "/package")
+      (html5:p '()
+        (html5:h4 () "/package")
         "Displays the documentation for a given package (and its contents)"
-        (xhtml:ul '(:class :parameters)
-          (xhtml:li '(:class "p")
+        (html5:ul '(:class :parameters)
+          (html5:li '(:class "p")
             "The \"p\" parameter controls the package documentation to display")))
-      (xhtml:p '()
-        (xhtml:h4 () "Document Index")
+      (html5:p '()
+        (html5:h4 () "Document Index")
         "The montezuma index driving this website can be downloaded at: "
-        (xhtml:a '(:href "doc-index.tar.gz" :rel "no-follow")
+        (html5:a '(:href "doc-index.tar.gz" :rel "no-follow")
           "doc-index.tar.gz"))
-      (xhtml:p '(:class "issues")
-        (xhtml:a '(href "https://github.com/AccelerationNet/manifest-search-web")
+      (html5:p '(:class "issues")
+        (html5:a '(href "https://github.com/AccelerationNet/manifest-search-web")
           "Please report bugs or suggest improvements at the github project page.")))))
 
 (hunchentoot:define-easy-handler (%welcome :uri "/")
