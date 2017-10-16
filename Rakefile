@@ -5,8 +5,7 @@ require '/opt/lisp/ADWCodeBase/misc/publish_lisp.rb'
 #these will probably set for every application.
 #What's the name of the app, will be used as a cname essentially.
 set :application, "lisp-search.acceleration.net"
-set :liveserver, nil
-
+set :liveserver, "true"
 
 #the server we are sshing to to make this happen.
 set :domain, "root@publispweb04"
@@ -18,6 +17,7 @@ set :share_folders, ["doc-index"]
 set :copy_folders, ["bin", "www", "etc"]
 #Folders int he published root that should be exposed through apache to the web.
 set :web_folders, ["www"]
+set :extra_symlinks, [["/var/www/lisp-search/lisp-search.acceleration.net/shared/doc-index/html/", "www/html"],]
 set :a2mods, []
 set :erb_files, ['etc/nginx.conf.erb']
 

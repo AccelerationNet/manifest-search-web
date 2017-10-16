@@ -1,5 +1,13 @@
 # manifest-search-web
 
+'''GO LOOK AT http://quickdocs.com''' it is more up to date and a 
+better looking UI.  This project was released at the same time, 
+but since quickdocs had a better name and a better UI, I decided 
+not to push my site.
+
+I have left this up as it was a neat project, but I dont plan on
+supporting or doing more with it.
+
 A Common Lisp library to make web accessible the results of 
 searching common lisp documentation (ala manifest-search).
 
